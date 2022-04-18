@@ -335,10 +335,12 @@ void cMeasurementLoop::updatePelletFeederData()
         if (fed3Event != m_prevEvent || fed3Event == 2)
             {
             m_prevEvent = fed3Event;
-            if (m_eventCount > 7)
+            if (m_eventCount > 9)
                 {
                 for (uint8_t nIndex = 0; nIndex <= this->num_bytes; ++nIndex)
                     {
+                    m_data.fed3.DataBytes[m_eventCount - 10][nIndex] = m_data.fed3.DataBytes[m_eventCount - 9][nIndex];
+                    m_data.fed3.DataBytes[m_eventCount - 9][nIndex] = m_data.fed3.DataBytes[m_eventCount - 8][nIndex];
                     m_data.fed3.DataBytes[m_eventCount - 8][nIndex] = m_data.fed3.DataBytes[m_eventCount - 7][nIndex];
                     m_data.fed3.DataBytes[m_eventCount - 7][nIndex] = m_data.fed3.DataBytes[m_eventCount - 6][nIndex];
                     m_data.fed3.DataBytes[m_eventCount - 6][nIndex] = m_data.fed3.DataBytes[m_eventCount - 5][nIndex];
@@ -347,13 +349,13 @@ void cMeasurementLoop::updatePelletFeederData()
                     m_data.fed3.DataBytes[m_eventCount - 3][nIndex] = m_data.fed3.DataBytes[m_eventCount - 2][nIndex];
                     m_data.fed3.DataBytes[m_eventCount - 2][nIndex] = m_data.fed3.DataBytes[m_eventCount - 1][nIndex];
                     }
-                m_eventCount = 7;
+                m_eventCount = 9;
                 }
             for (uint8_t nIndex = 1; nIndex <= this->num_bytes; ++nIndex)
                 {
                 m_data.fed3.DataBytes[m_eventCount][nIndex - 1] = this->au8Buffer[nIndex + BYTE_CNT];
                 }
-            if (m_eventCount <= 7)
+            if (m_eventCount <= 9)
                 {
                 m_eventCount += 1;
                 }

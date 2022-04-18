@@ -109,7 +109,7 @@ public:
         // fed3 data
         struct FED3
             {
-            uint8_t                 DataBytes[8][32];
+            uint8_t                 DataBytes[10][32];
             };
 
         //---------------------------
