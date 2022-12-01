@@ -114,19 +114,53 @@ cMeasurementLoop::fillTxBuffer(
         uint8_t dataIndex;
         dataIndex = 0;
 
-        uint16_t fed3Vbat;
+        // Timestamp (4-bytes)
+        uint32_t fed3TimeStamp;
+        fed3TimeStamp = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 24 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1] << 16
+                | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 2] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 3];
+        dataIndex = dataIndex + 4;
+        gCatena.SafePrintf("fed3TimeStamp: %u\n", fed3TimeStamp);
+
+        // Version (3-bytes)
+        uint32_t fed3VersionMajor;
+        uint32_t fed3VersionMinor;
+        uint32_t fed3VersionLocal;
+        fed3VersionMajor = m_data.fed3.DataBytes[m_BufferIndex][dataIndex];
+        dataIndex = dataIndex + 1;
+        fed3VersionMinor = m_data.fed3.DataBytes[m_BufferIndex][dataIndex];
+        dataIndex = dataIndex + 1;
+        fed3VersionLocal = m_data.fed3.DataBytes[m_BufferIndex][dataIndex];
+        dataIndex = dataIndex + 1;
+        gCatena.SafePrintf("fed3Version: %d.%d.%d\n", fed3VersionMajor, fed3VersionMinor, fed3VersionLocal);
+
+        // device number (2-bytes)
+        uint16_t fed3DeviceNumber;
+        fed3DeviceNumber = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1];
+        dataIndex = dataIndex + 2;
+        gCatena.SafePrintf("fed3DeviceNumber: %d\n", fed3DeviceNumber);
+
+        // session Type (1-byte)
+        uint16_t fed3SessionType;
+        fed3SessionType = m_data.fed3.DataBytes[m_BufferIndex][dataIndex];
+        dataIndex = dataIndex + 1;
+        gCatena.SafePrintf("fed3SessionType Index: [%d] %s\n", fed3SessionType, sessionType[fed3SessionType]);
+
+        // FED3 Battery voltage
+		uint16_t fed3Vbat;
         fed3Vbat = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1];
         dataIndex = dataIndex + 2;
         if (fed3Vbat & 0x8000)
                 fed3Vbat |= -0x10000;
         gCatena.SafePrintf("fed3Vbat: %d mV\n", (int) ((fed3Vbat / 4096.00) * 1000.f));
 
+        // number of motor turns (4-bytes)
         uint32_t fed3NumMotorTurns;
-        fed3NumMotorTurns = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1]
+        fed3NumMotorTurns = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 24 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1] << 16
                 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 2] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 3];
         dataIndex = dataIndex + 4;
         gCatena.SafePrintf("fed3NumMotorTurns: %d\n", fed3NumMotorTurns);
 
+        // fixed ratio (2-bytes)
         uint16_t fed3FixedRatio;
         fed3FixedRatio = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1];
         dataIndex = dataIndex + 2;
@@ -134,6 +168,7 @@ cMeasurementLoop::fillTxBuffer(
                 fed3FixedRatio |= -0x10000;
         gCatena.SafePrintf("fed3FixedRatio: %d\n", fed3FixedRatio);
 
+        // Event and Event time (2-bytes)
         uint16_t fed3EventActive;
         uint32_t fed3PokeTime;
         uint32_t fed3RetrievalTime;
@@ -163,25 +198,29 @@ cMeasurementLoop::fillTxBuffer(
                 gCatena.SafePrintf("fed3EventActive: Unknown\n");
         dataIndex = dataIndex + 2;
 
+        // Left count (4-bytes)
         uint32_t fed3LeftCount;
-        fed3LeftCount = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1]
+        fed3LeftCount = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 24 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1] << 16
                 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 2] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 3];
         dataIndex = dataIndex + 4;
         gCatena.SafePrintf("fed3LeftCount: %d\n", fed3LeftCount);
 
-        uint32_t fed3RighttCount;
-        fed3RighttCount = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1]
+        // Right count (4-bytes)
+        uint32_t fed3RightCount;
+        fed3RightCount = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 24 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1] << 16
                 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 2] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 3];
         dataIndex = dataIndex + 4;
-        gCatena.SafePrintf("fed3RighttCount: %d\n", fed3RighttCount);
+        gCatena.SafePrintf("fed3RightCount: %d\n", fed3RightCount);
 
+        // Pellet count (4-bytes)
         uint32_t fed3PelletCount;
-        fed3PelletCount = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1]
+        fed3PelletCount = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 24 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1] << 16
                 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 2] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 3];
         dataIndex = dataIndex + 4;
         gCatena.SafePrintf("fed3PelletCount: %d\n", fed3PelletCount);
 
-        uint16_t fed3BlockPelletCount;
+        // Block pellet count (2-bytes)
+		uint16_t fed3BlockPelletCount;
         fed3BlockPelletCount = m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1];
         dataIndex = dataIndex + 2;
         if(fed3BlockPelletCount & 0x8000)

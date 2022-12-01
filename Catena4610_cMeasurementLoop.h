@@ -36,6 +36,7 @@ Author:
 #include <Catena_Date.h>
 
 #include <cstdint>
+#include <cstring>
 
 extern McciCatena::Catena gCatena;
 extern McciCatena::Catena::LoRaWAN gLoRaWAN;
@@ -48,6 +49,22 @@ extern McciCatena::StatusLed gLed;
 #define INVALID_MSG_ID  4
 
 static constexpr unsigned kT35 = 5;
+
+static const char* sessionType[] = {
+        "ClassicFED3",
+        "ClosedEconomy_PR1",
+        "Dispenser",
+        "Extinction",
+        "FixedRatio1",
+        "FR_Customizable",
+        "FreeFeeding",
+        "MenuExample",
+        "Optogenetic_Self_Stim",
+        "Pavlovian",
+        "ProbReversalTask",
+        "ProgressiveRatio",
+        "RandomRatio"
+        };
 
 namespace McciCatena4610 {
 
@@ -79,7 +96,7 @@ public:
             };
 
     // buffer size for uplink data
-    static constexpr size_t kTxBufferSize = 42;
+    static constexpr size_t kTxBufferSize = 52;
 
     // the structure of a measurement
     struct Measurement
@@ -109,7 +126,7 @@ public:
         // fed3 data
         struct FED3
             {
-            uint8_t                 DataBytes[10][32];
+            uint8_t                 DataBytes[10][42];
             };
 
         //---------------------------
@@ -248,7 +265,7 @@ public:
     uint16_t u16InCnt, u16errCnt;
     uint8_t errCode;
     uint8_t num_bytes;
-    uint8_t au8Buffer[32];
+    uint8_t au8Buffer[42];
 
     // initialize measurement FSM.
     void begin();

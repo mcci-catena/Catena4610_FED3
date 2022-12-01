@@ -331,7 +331,7 @@ void cMeasurementLoop::updatePelletFeederData()
         {
         uint8_t fed3Event;
 
-        fed3Event = 0x03 & this->au8Buffer[BYTE_CNT + 10];
+        fed3Event = 0x03 & this->au8Buffer[BYTE_CNT + 20];
         if (fed3Event != m_prevEvent || fed3Event == 2)
             {
             m_prevEvent = fed3Event;
