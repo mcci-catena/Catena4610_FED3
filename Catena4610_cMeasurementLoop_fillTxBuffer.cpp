@@ -168,34 +168,25 @@ cMeasurementLoop::fillTxBuffer(
                 fed3FixedRatio |= -0x10000;
         gCatena.SafePrintf("fed3FixedRatio: %d\n", fed3FixedRatio);
 
-        // Event and Event time (2-bytes)
+        // Event Active (1-byte)
         uint16_t fed3EventActive;
+        fed3EventActive = m_data.fed3.DataBytes[m_BufferIndex][dataIndex];
+        dataIndex = dataIndex + 1;
+        gCatena.SafePrintf("fed3EventActive Index: [%d] %s\n", fed3EventActive, eventActive[fed3EventActive]);
+
+        // Event time (2-bytes)
         uint32_t fed3PokeTime;
         uint32_t fed3RetrievalTime;
-        fed3EventActive = 0x03 & m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1];
-        if (fed3EventActive == 1)
+        if (fed3EventActive == 11)
                 {
-                gCatena.SafePrintf("fed3EventActive: Left\n");
-                fed3PokeTime = ((m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1]) >> 2);
-                fed3PokeTime = fed3PokeTime & 0x3FFF;
-                gCatena.SafePrintf("fed3PokeTime: %d ms\n", fed3PokeTime * 4);
-                }
-        else if (fed3EventActive == 2)
-                {
-                gCatena.SafePrintf("fed3EventActive: Right\n");
-                fed3PokeTime = ((m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1]) >> 2);
-                fed3PokeTime = fed3PokeTime & 0x3FFF;
-                gCatena.SafePrintf("fed3PokeTime: %d ms\n", fed3PokeTime * 4);
-                }
-        else if (fed3EventActive == 3)
-                {
-                gCatena.SafePrintf("fed3EventActive: Pellet\n");
-                fed3RetrievalTime = ((m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1]) >> 2);
-                fed3RetrievalTime = fed3RetrievalTime & 0x3FFF;
+                fed3RetrievalTime = ((m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1]));
                 gCatena.SafePrintf("fed3RetrievalTime: %d ms\n", fed3RetrievalTime * 4);
                 }
         else
-                gCatena.SafePrintf("fed3EventActive: Unknown\n");
+                {
+                fed3PokeTime = ((m_data.fed3.DataBytes[m_BufferIndex][dataIndex] << 8 | m_data.fed3.DataBytes[m_BufferIndex][dataIndex + 1]));
+                gCatena.SafePrintf("fed3PokeTime: %d ms\n", fed3PokeTime * 4);
+                }
         dataIndex = dataIndex + 2;
 
         // Left count (4-bytes)
