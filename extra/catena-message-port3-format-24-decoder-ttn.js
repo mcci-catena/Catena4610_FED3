@@ -293,33 +293,117 @@ function Decoder(bytes, port) {
     }
 
     if (flags & 0x40) {
+        // fetch time; convert to database time (which is UTC-like ignoring leap seconds)
+        var fed3Time = new Date(DecodeU32(Parse));
+        decoded.fed3Time = fed3Time.getTime();
+
+        var vMajor = bytes[Parse.i++];
+        var vMinor = bytes[Parse.i++];
+        var vPatch = bytes[Parse.i++];
+        decoded.fed3Version = vMajor + "." + vMinor + "." + vPatch;
+
+        decoded.fed3DeviceNumber = DecodeU16(Parse);
+
+        var sessionType = bytes[Parse.i++];
+
+        if (sessionType === 1) {
+            decoded.fed3SessionType = "ClassicFED3";
+        }
+        else if (sessionType === 2) {
+            decoded.fed3SessionType = "ClosedEconomy_PR1";
+        }
+        else if (sessionType === 3) {
+            decoded.fed3SessionType = "Dispenser";
+        }
+        else if (sessionType === 4) {
+            decoded.fed3SessionType = "Extinction";
+        }
+        else if (sessionType === 5) {
+            decoded.fed3SessionType = "FixedRatio1";
+        }
+        else if (sessionType === 6) {
+            decoded.fed3SessionType = "FR_Customizable";
+        }
+        else if (sessionType === 7) {
+            decoded.fed3SessionType = "FreeFeeding";
+        }
+        else if (sessionType === 8) {
+            decoded.fed3SessionType = "MenuExample";
+        }
+        else if (sessionType === 9) {
+            decoded.fed3SessionType = "Optogenetic_Self_Stim";
+        }
+        else if (sessionType === 10) {
+            decoded.fed3SessionType = "Pavlovian";
+        }
+        else if (sessionType === 11) {
+            decoded.fed3SessionType = "ProbReversalTask";
+        }
+        else if (sessionType === 12) {
+            decoded.fed3SessionType = "ProgressiveRatio";
+        }
+        else if (sessionType === 13) {
+            decoded.fed3SessionType = "RandomRatio";
+        }
+        else {
+            decoded.fed3SessionType = "Custom_Application";
+        }
+
         decoded.fed3Vbat = DecodeV(Parse);
-		decoded.fed3NumMotorTurns = DecodeU32(Parse);
-		decoded.fed3FixedRatio = DecodeI16(Parse);
+        decoded.fed3NumMotorTurns = DecodeU32(Parse);
+        decoded.fed3FixedRatio = DecodeI16(Parse);
 
-        var nIndex = (Parse.i) + 1;
-        fed3EventActive = bytes[nIndex];
+        var fed3EventActive = bytes[Parse.i++];
+        if (fed3EventActive === 1) {
+            decoded.fed3EventActive = "Left";
+        }
+        else if (fed3EventActive === 2) {
+            decoded.fed3EventActive = "LeftShort";
+        }
+        else if (fed3EventActive === 3) {
+            decoded.fed3EventActive = "LeftWithPellet";
+        }
+        else if (fed3EventActive === 4) {
+            decoded.fed3EventActive = "LeftinTimeout";
+        }
+        else if (fed3EventActive === 5) {
+            decoded.fed3EventActive = "LeftDuringDispense";
+        }
+        else if (fed3EventActive === 6) {
+            decoded.fed3EventActive = "Right";
+        }
+        else if (fed3EventActive === 7) {
+            decoded.fed3EventActive = "RightShort";
+        }
+        else if (fed3EventActive === 8) {
+            decoded.fed3EventActive = "RightWithPellet";
+        }
+        else if (fed3EventActive === 9) {
+            decoded.fed3EventActive = "RightinTimeout";
+        }
+        else if (fed3EventActive === 10) {
+            decoded.fed3EventActive = "RightDuringDispense";
+        }
+        else if (fed3EventActive === 11) {
+            decoded.fed3EventActive = "Pellet";
+        }
+        else {
+            decoded.fed3EventActive = "Unknown";
+        }
 
-		if (fed3EventActive == 1) {
-			decoded.fed3EventActive = "Left";
+        var fed3EventTime = DecodeU16(Parse);
+        if (fed3EventActive === 11) {
+            decoded.fed3RetrievalTime = fed3EventTime * 4.0 / 1000.0;
         }
-		else if (fed3EventActive == 2) {
-			decoded.fed3EventActive = "Right";
-            decoded.fed3PokeTime = (DecodeU16(Parse) >> 2 & 0x3FFF) * 4.0 / 1000.00;
-        }
-		else if (fed3EventActive == 3) {
-			decoded.fed3EventActive = "Pellet";
-            decoded.fed3RetrievalTime = (DecodeU16(Parse) >> 2 & 0x3FFF) * 4.0 / 1000.00;
-        }
-		else {
-			decoded.fed3EventActive = "Unknown";
+        else {
+            decoded.fed3PokeTime = fed3EventTime * 4.0 / 1000.0;
         }
 
-		decoded.fed3LeftCount = DecodeU32(Parse);
-		decoded.fed3RightCount = DecodeU32(Parse);
-		decoded.fed3PelletCount = DecodeU32(Parse);
-		decoded.fed3BlockPelletCount = DecodeU16(Parse);	
-		}
+        decoded.fed3LeftCount = DecodeU32(Parse);
+        decoded.fed3RightCount = DecodeU32(Parse);
+        decoded.fed3PelletCount = DecodeU32(Parse);
+        decoded.fed3BlockPelletCount = DecodeU16(Parse);
+        }
     return decoded;
 	}
 
