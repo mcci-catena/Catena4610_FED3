@@ -51,6 +51,7 @@ extern McciCatena::StatusLed gLed;
 static constexpr unsigned kT35 = 5;
 
 static const char* sessionType[] = {
+        "Custom_Application",
         "ClassicFED3",
         "ClosedEconomy_PR1",
         "Dispenser",
@@ -64,6 +65,21 @@ static const char* sessionType[] = {
         "ProbReversalTask",
         "ProgressiveRatio",
         "RandomRatio"
+        };
+
+static const char* eventActive[] = {
+        "Unknown",
+        "Left",
+        "LeftShort",
+        "LeftWithPellet",
+        "LeftinTimeout",
+        "LeftDuringDispense",
+        "Right",
+        "RightShort",
+        "RightWithPellet",
+        "RightinTimeout",
+        "RightDuringDispense",
+        "Pellet"
         };
 
 namespace McciCatena4610 {
@@ -96,7 +112,7 @@ public:
             };
 
     // buffer size for uplink data
-    static constexpr size_t kTxBufferSize = 52;
+    static constexpr size_t kTxBufferSize = 54;
 
     // the structure of a measurement
     struct Measurement
@@ -126,7 +142,7 @@ public:
         // fed3 data
         struct FED3
             {
-            uint8_t                 DataBytes[10][42];
+            uint8_t                 DataBytes[10][44];
             };
 
         //---------------------------
@@ -157,7 +173,7 @@ class cMeasurementLoop : public McciCatena::cPollableObject
     {
 public:
     // some parameters
-    static constexpr std::uint8_t kUplinkPort = 2;
+    static constexpr std::uint8_t kUplinkPort = 3;
     static constexpr bool kEnableDeepSleep = false;
     using MeasurementFormat = cMeasurementFormat;
     using Measurement = MeasurementFormat::Measurement;
@@ -265,7 +281,7 @@ public:
     uint16_t u16InCnt, u16errCnt;
     uint8_t errCode;
     uint8_t num_bytes;
-    uint8_t au8Buffer[42];
+    uint8_t au8Buffer[44];
 
     // initialize measurement FSM.
     void begin();
